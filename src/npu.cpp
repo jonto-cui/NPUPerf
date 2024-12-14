@@ -36,7 +36,7 @@ void NPU::update_signals() {
         if (req.read()) {
             data_out.write(process_result);
         } else {
-            data_out.write(0); // 默认值
+            data_out.write(10); // 默认值
         }
 
         // 更新 `mul_result` 信号
