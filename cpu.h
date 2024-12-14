@@ -5,8 +5,8 @@
 
 SC_MODULE(CPU) {
     sc_in<bool> clk;
-    sc_out<int> data_out;
     sc_in<int> data_in;
+    sc_out<int> data_out;
     sc_out<bool> req, ack;
 
     void process();

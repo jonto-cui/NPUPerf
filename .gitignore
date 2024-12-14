@@ -1,0 +1,8 @@
+# 忽略 .vscode 文件夹
+.vscode/
+
+# 忽略所有可执行文件
+*.exe
+*.out
+*.bin
+soc_top

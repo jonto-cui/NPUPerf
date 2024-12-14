@@ -13,9 +13,10 @@ SC_MODULE(DDR) {
 
     void process();
 
-    SC_CTOR(DDR) : memory(0) {
+    SC_CTOR(DDR) : memory(5) {
         SC_THREAD(process);
     }
 };
 
 #endif  // DDR_H
+ 
