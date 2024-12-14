@@ -17,6 +17,7 @@ SC_MODULE(NPU) {
     void process_data();           // 数据处理
     void perform_multiplication(); // 乘法逻辑
     void update_signals();         // 统一信号更新
+    void conv();                   // TODO:支持卷积运算，使用vector等
 
     SC_CTOR(NPU) {
         SC_THREAD(control_logic);

@@ -11,12 +11,12 @@ SC_MODULE(DDR) {
 
     int memory;             // 模拟的内存存储
 
-    void process();
+    void process();         // 处理读写请求
 
-    SC_CTOR(DDR) : memory(5) {
+    SC_CTOR(DDR) : memory(5) {  // 初始化 `memory` 为 5
         SC_THREAD(process);
+        sensitive << read << write;
     }
 };
 
 #endif  // DDR_H
- 

@@ -25,6 +25,8 @@ void NPU::perform_multiplication() {
     }
 }
 
+void NPU::conv(){} 
+
 // 统一信号更新
 void NPU::update_signals() {
     while (true) {
