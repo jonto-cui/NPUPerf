@@ -15,6 +15,9 @@ SC_MODULE(Top) {
     sc_signal<int> shared_mem_data_out;
     sc_signal<bool> cpu_req, cpu_ack, npu_req, npu_ack, ddr_read, ddr_write, shared_mem_read, shared_mem_write;
 
+    // DDR 新增信号
+    sc_signal<int> ddr_row_addr, ddr_col_addr;
+
     // 模块实例化
     CPU cpu;
     NPU npu;
@@ -62,6 +65,8 @@ SC_MODULE(Top) {
         std::cout << "[System] NPU starts transferring data to DDR at " << sc_time_stamp() << std::endl;
         npu_req.write(true);
         wait(npu_ack.posedge_event());
+        ddr_row_addr.write(1); // 设置目标行地址
+        ddr_col_addr.write(2); // 设置目标列地址
         ddr_data_in.write(npu_data_out.read()); // 数据传输到 DDR
         ddr_write.write(true);
         wait(20, SC_NS);
@@ -71,6 +76,8 @@ SC_MODULE(Top) {
 
         // DDR -> SharedMemory 数据存储
         std::cout << "[System] DDR starts transferring data to SharedMemory at " << sc_time_stamp() << std::endl;
+        ddr_row_addr.write(1); // 设置目标行地址
+        ddr_col_addr.write(2); // 设置目标列地址
         ddr_read.write(true);
         wait(20, SC_NS);
         ddr_read.write(false);
@@ -112,6 +119,8 @@ SC_MODULE(Top) {
         ddr.data_out(ddr_data_out);
         ddr.read(ddr_read);
         ddr.write(ddr_write);
+        ddr.row_addr(ddr_row_addr);
+        ddr.col_addr(ddr_col_addr);
 
         shared_mem.data_in(ddr_data_out);
         shared_mem.data_out(shared_mem_data_out);
@@ -123,6 +132,7 @@ SC_MODULE(Top) {
         SC_THREAD(system_process); // 系统流程
     }
 };
+
 
 // 主函数
 int sc_main(int argc, char* argv[]) {
