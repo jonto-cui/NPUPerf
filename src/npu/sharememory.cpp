@@ -12,4 +12,3 @@ void SharedMemory::process() {
         }
     }
 }
-

@@ -5,7 +5,7 @@ void NPU::control_logic() {
     while (true) {
         wait(); // 等待时钟
         if (req.read()) {
-            process_result = data_in.read() * 2; // 模拟处理逻辑
+            process_result = data_in.read() * 3; // 模拟处理逻辑
             ack.write(true);
         } else {
             ack.write(false);
