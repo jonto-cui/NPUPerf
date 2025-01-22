@@ -1,6 +1,6 @@
 // L2 Memoyr
 // Port: Read_addr Write_addr Read_data Write_data
-#include "sharememory.h"
+#include "share_mem.h"
 
 void SharedMemory::process() {
     while (true) {

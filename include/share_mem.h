@@ -4,8 +4,8 @@
 #include <systemc.h>
 
 SC_MODULE(SharedMemory) {
-    sc_in<int> data_in;     // 写入的数据
-    sc_out<int> data_out;   // 读取的数据
+    sc_in<double> data_in;     // 写入的数据
+    sc_out<double> data_out;   // 读取的数据
     sc_in<bool> read;       // 读请求信号
     sc_in<bool> write;      // 写请求信号
 

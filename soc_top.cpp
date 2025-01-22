@@ -2,17 +2,17 @@
 #include "cpu.h"
 #include "npu.h"
 #include "ddr.h"
-#include "sharememory.h"
+#include "share_mem.h"
 
 SC_MODULE(Top) {
     // 新增的信号
-    sc_signal<bool> npu_mul_start;
-    sc_signal<int> npu_mul_result;
+    sc_signal<bool> npu_conv_start;
+    sc_signal<double> npu_mul_result;
 
     // 信号定义
     sc_signal<bool> clk;
-    sc_signal<int> cpu_data_out, npu_data_in, npu_data_out, ddr_data_in, ddr_data_out;
-    sc_signal<int> shared_mem_data_out;
+    sc_signal<double> cpu_data_out, npu_data_in, npu_data_out, ddr_data_in, ddr_data_out;
+    sc_signal<double> shared_mem_data_out;
     sc_signal<bool> cpu_req, cpu_ack, npu_req, npu_ack, ddr_read, ddr_write, shared_mem_read, shared_mem_write;
 
     // DDR 新增信号
@@ -22,7 +22,7 @@ SC_MODULE(Top) {
     CPU cpu;
     NPU npu;
     DDR ddr;
-    SharedMemory shared_mem;
+    SharedMemory share_mem;
 
     // 时钟生成
     void clock_gen() {
@@ -43,7 +43,7 @@ SC_MODULE(Top) {
         ddr_write.write(false);
         shared_mem_read.write(false);
         shared_mem_write.write(false);
-        npu_mul_start.write(false);
+        npu_conv_start.write(false);
         wait(20, SC_NS);
 
         // CPU -> NPU 数据传输
@@ -53,13 +53,13 @@ SC_MODULE(Top) {
         cpu_req.write(false);
         std::cout << "[System] CPU data transfer to NPU complete at " << sc_time_stamp() << std::endl;
 
-        // NPU 进行乘法操作
-        std::cout << "[System] NPU starts multiplication at " << sc_time_stamp() << std::endl;
-        npu_mul_start.write(true);
+        // NPU 进行卷积操作
+        std::cout << "[System] NPU starts convolution at " << sc_time_stamp() << std::endl;
+        npu_conv_start.write(true);
         wait(10, SC_NS);
-        npu_mul_start.write(false);
+        npu_conv_start.write(false);
         wait(10, SC_NS);
-        std::cout << "[System] NPU multiplication result: " << npu_mul_result.read() << " at " << sc_time_stamp() << std::endl;
+        std::cout << "[System] NPU convolution result: " << npu_mul_result.read() << " at " << sc_time_stamp() << std::endl;
 
         // NPU -> DDR 数据存储
         std::cout << "[System] NPU starts transferring data to DDR at " << sc_time_stamp() << std::endl;
@@ -99,7 +99,7 @@ SC_MODULE(Top) {
 
     // 构造函数
     SC_CTOR(Top)
-        : cpu("CPU"), npu("NPU"), ddr("DDR"), shared_mem("SharedMemory") {
+        : cpu("CPU"), npu("NPU"), ddr("DDR"), share_mem("SharedMemory") {
         // 信号连接
         cpu.clk(clk);
         cpu.data_out(cpu_data_out);
@@ -112,7 +112,7 @@ SC_MODULE(Top) {
         npu.data_out(npu_data_out);
         npu.req(npu_req);
         npu.ack(npu_ack);
-        npu.mul_start(npu_mul_start);
+        npu.conv_start(npu_conv_start);  // 连接卷积启动信号
         npu.mul_result(npu_mul_result);
 
         ddr.data_in(ddr_data_in);
@@ -122,17 +122,16 @@ SC_MODULE(Top) {
         ddr.row_addr(ddr_row_addr);
         ddr.col_addr(ddr_col_addr);
 
-        shared_mem.data_in(ddr_data_out);
-        shared_mem.data_out(shared_mem_data_out);
-        shared_mem.read(shared_mem_read);
-        shared_mem.write(shared_mem_write);
+        share_mem.data_in(ddr_data_out);
+        share_mem.data_out(shared_mem_data_out);
+        share_mem.read(shared_mem_read);
+        share_mem.write(shared_mem_write);
 
         // 线程定义
         SC_THREAD(clock_gen);       // 时钟生成
         SC_THREAD(system_process); // 系统流程
     }
 };
-
 
 // 主函数
 int sc_main(int argc, char* argv[]) {

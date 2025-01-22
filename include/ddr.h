@@ -7,8 +7,8 @@
 SC_MODULE(DDR) {
     sc_in<int> row_addr;    // 行地址
     sc_in<int> col_addr;    // 列地址
-    sc_in<int> data_in;     // 写入的数据
-    sc_out<int> data_out;   // 读取的数据
+    sc_in<double> data_in;     // 写入的数据
+    sc_out<double> data_out;   // 读取的数据
     sc_in<bool> read;       // 读请求信号
     sc_in<bool> write;      // 写请求信号
 
