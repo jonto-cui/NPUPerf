@@ -1,6 +1,7 @@
 TARGET = soc_top
 
-SRC = $(wildcard src/*.cpp) soc_top.cpp
+# 找到 src 目录下的所有 cpp 文件
+SRC = $(wildcard src/**/*.cpp) $(wildcard src/*.cpp) soc_top.cpp
 CXX = g++
 CXXFLAGS = -g -O0 -Wall -Iinclude -I/home/cuijt/systemc_project/systemc-2.3.4/include
 LDFLAGS = -L/home/cuijt/systemc_project/systemc-2.3.4/lib-linux64 -lsystemc -lm
