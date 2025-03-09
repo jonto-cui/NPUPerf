@@ -17,6 +17,9 @@ SC_MODULE(Top) {
 
     // DDR 新增信号
     sc_signal<int> ddr_row_addr, ddr_col_addr;
+    // 在 Top 模块中添加信号
+    sc_signal<int> shared_mem_row_addr, shared_mem_col_addr;
+
 
     // 模块实例化
     CPU cpu;
@@ -126,6 +129,10 @@ SC_MODULE(Top) {
         share_mem.data_out(shared_mem_data_out);
         share_mem.read(shared_mem_read);
         share_mem.write(shared_mem_write);
+            
+        // 在构造函数中绑定信号
+        share_mem.row_addr(shared_mem_row_addr);
+        share_mem.col_addr(shared_mem_col_addr);
 
         // 线程定义
         SC_THREAD(clock_gen);       // 时钟生成
