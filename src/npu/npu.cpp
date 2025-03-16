@@ -19,18 +19,42 @@ void NPU::control_logic() {
 }
 
 void NPU::conv() {
-    // 获取输入数据并转换为矩阵和向量
-    MatrixOperations::Matrix inputMatrix = {{data_in.read(), 2.0}, {3.0, 4.0}};
+    // 假设 feature map 是一个 3x3 矩阵，使用 2x2 滑动窗口进行卷积
+    static MatrixOperations::Matrix featureMap(3, std::vector<double>(3, 0.0));
+    
+    // 读取新的输入数据并更新 feature map
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            featureMap[i][j] = data_in.read(); // 模拟数据流入
+        }
+    }
+
+    // 卷积核固定
+    static const MatrixOperations::Matrix kernel = {
+        {1.0, 0.5},
+        {0.5, 1.0}
+    };
+
+    // 计算滑动窗口的卷积
+    MatrixOperations::Matrix outputMatrix(2, std::vector<double>(2, 0.0));
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            double sum = 0.0;
+            for (int ki = 0; ki < 2; ++ki) {
+                for (int kj = 0; kj < 2; ++kj) {
+                    sum += featureMap[i + ki][j + kj] * kernel[ki][kj];
+                }
+            }
+            outputMatrix[i][j] = sum;
+        }
+    }
+
+    // 使用向量处理模块
     MatrixOperations::Vector inputVector = {1.0, 2.0};
-
-    // 调用矩阵和向量模块
-    MatrixOperations::Matrix matrixResult = MatrixOperations::multiply(inputMatrix, inputMatrix);
-    MatrixOperations::Vector vectorResult = MatrixOperations::multiply(matrixResult, inputVector);
-
-    // 使用向量加法模块对结果进行进一步处理
+    MatrixOperations::Vector vectorResult = MatrixOperations::multiply(outputMatrix, inputVector);
     VectorOperations::Vector finalResult = VectorOperations::add(vectorResult, inputVector);
 
-    // 模拟处理逻辑，结果取向量第一个值（根据具体需求可以调整）
+    // 结果取第一个值
     process_result = finalResult[0];
 
     // 将结果写入输出
