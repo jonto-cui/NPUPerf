@@ -4,9 +4,9 @@ TARGET = npu_out
 SRC = $(wildcard src/*.cpp) 
 TEST_SRC = test/testbench.cpp
 CXX = g++
-CXXFLAGS = -g -O0 -w -Iinclude -I/home/cuijt/systemc_project/systemc-2.3.4/include
-LDFLAGS = -L/home/cuijt/systemc_project/systemc-2.3.4/lib-linux64 -lsystemc -lm
-RPATH = -Wl,-rpath,/home/cuijt/systemc_project/systemc-2.3.4/lib-linux64
+CXXFLAGS = -g -O0 -w -Iinclude -I/home/jordan/workspace/systemC/systemc-3.0.1/include
+LDFLAGS = -L/home/jordan/workspace/systemC/systemc-3.0.1/lib-linux64 -lsystemc -lm
+RPATH = -Wl,-rpath,/home/jordan/workspace/systemC/systemc-3.0.1/lib-linux64
 
 .PHONY: all clean
 

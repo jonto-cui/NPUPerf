@@ -1,23 +1,18 @@
+// l2memory.h
 #ifndef L2MEMORY_H
 #define L2MEMORY_H
 
 #include "common.h"
 
 SC_MODULE(L2Memory) {
-    sc_in<bool> clk;
-    sc_in<bool> write_en;
-    sc_in<unsigned> addr;
-    sc_in<uint128_t> data_in;
-    sc_out<uint128_t> data_out;
-    
-    uint8_t memory[L2_SIZE];
-    
+    std::vector<data128_t> memory;
+
     SC_CTOR(L2Memory) {
-        SC_METHOD(read_write);
-        sensitive << clk.pos();
+        memory.resize(L2_SIZE_BYTES / (DATA_WIDTH / 8)); // 每128bit算一个slot
     }
-    
-    void read_write();
+
+    void write(addr_t addr, data128_t data);
+    data128_t read(addr_t addr);
 };
 
-#endif // L2MEMORY_H
+#endif

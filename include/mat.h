@@ -2,30 +2,26 @@
 #define MAT_H
 
 #include "common.h"
+#include "l1memory.h"
 
-SC_MODULE(MatModule) {
+SC_MODULE(MAT) {
     sc_in<bool> clk;
-    sc_in<bool> start;
-    sc_in<unsigned> bank_a;
-    sc_in<unsigned> bank_b;
-    sc_in<unsigned> bank_result;
-    sc_in<unsigned> M;
-    sc_in<unsigned> N;
-    sc_in<unsigned> K;
-    sc_out<bool> done;
-    
-    sc_port<sc_signal_out_if<bool>> l1_write_en;
-    sc_port<sc_signal_out_if<unsigned>> l1_bank_out;
-    sc_port<sc_signal_out_if<unsigned>> l1_addr_out;
-    sc_port<sc_signal_out_if<uint128_t>> l1_data_out;
-    sc_port<sc_signal_in_if<uint128_t>> l1_data_in_a;
-    sc_port<sc_signal_in_if<uint128_t>> l1_data_in_b;
-    
-    SC_CTOR(MatModule) {
-        SC_CTHREAD(matrix_multiply, clk.pos());
+    L1Memory* l1;
+
+    SC_CTOR(MAT) {
+        SC_THREAD(run);
+        sensitive << clk.pos();
     }
-    
-    void matrix_multiply();
+
+    void configure(int bank0, int bank1, int dst_bank, int K_len);
+
+private:
+    struct Job {
+        int bank0, bank1, dst_bank, K_len;
+        bool valid = false;
+    } job;
+
+    void run();
 };
 
-#endif // MAT_H
+#endif

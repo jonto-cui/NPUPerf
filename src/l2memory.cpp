@@ -1,16 +1,19 @@
+// l2memory.cpp
 #include "l2memory.h"
 
-void L2Memory::read_write() {
-    unsigned word_addr = addr.read() * (BANK_WIDTH/8);
-    if (write_en.read()) {
-        for (int i = 0; i < BANK_WIDTH/8; i++) {
-            memory[word_addr + i] = data_in.read().range((i+1)*8-1, i*8);
-        }
+void L2Memory::write(addr_t addr, data128_t data) {
+    if (addr < memory.size()) {
+        memory[addr] = data;
     } else {
-        uint128_t temp;
-        for (int i = 0; i < BANK_WIDTH/8; i++) {
-            temp.range((i+1)*8-1, i*8) = memory[word_addr + i];
-        }
-        data_out.write(temp);
+        SC_REPORT_WARNING("L2Memory", "Invalid write address.");
+    }
+}
+
+data128_t L2Memory::read(addr_t addr) {
+    if (addr < memory.size()) {
+        return memory[addr];
+    } else {
+        SC_REPORT_WARNING("L2Memory", "Invalid read address.");
+        return 0;
     }
 }

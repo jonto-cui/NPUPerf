@@ -1,20 +1,18 @@
 #include "l1memory.h"
 
-void L1Bank::read_write() {
-    if (write_en.read()) {
-        memory[addr.read()] = data_in.read();
+void L1Memory::write(int bank_id, int addr, data128_t data) {
+    if (bank_id < BANK_NUM && addr < BANK_DEPTH) {
+        banks[bank_id][addr].write(data);
+    } else {
+        SC_REPORT_WARNING("L1Memory", "Invalid write access.");
     }
-    data_out.write(memory[addr.read()]);
 }
 
-L1Memory::L1Memory(sc_module_name name) : sc_module(name) {
-    banks.resize(NUM_BANKS);
-    for (int i = 0; i < NUM_BANKS; i++) {
-        banks[i] = new L1Bank(sc_gen_unique_name("bank"));
-        banks[i]->clk(clk);
-        banks[i]->write_en(write_en[i]);
-        banks[i]->addr(addr[i]);
-        banks[i]->data_in(data_in[i]);
-        banks[i]->data_out(data_out[i]);
+data128_t L1Memory::read(int bank_id, int addr) {
+    if (bank_id < BANK_NUM && addr < BANK_DEPTH) {
+        return banks[bank_id][addr].read();
+    } else {
+        SC_REPORT_WARNING("L1Memory", "Invalid read access.");
+        return 0;
     }
 }

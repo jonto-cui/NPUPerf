@@ -3,33 +3,20 @@
 
 #include "common.h"
 
-SC_MODULE(L1Bank) {
-    sc_in<bool> clk;
-    sc_in<bool> write_en;
-    sc_in<unsigned> addr;
-    sc_in<uint128_t> data_in;
-    sc_out<uint128_t> data_out;
-    
-    uint128_t memory[BANK_DEPTH];
-    
-    SC_CTOR(L1Bank) {
-        SC_METHOD(read_write);
-        sensitive << clk.pos();
-    }
-    
-    void read_write();
-};
+#define BANK_NUM   128
+#define BANK_DEPTH 256
 
 SC_MODULE(L1Memory) {
-    sc_in<bool> clk;
-    vector<sc_in<bool>> write_en;
-    vector<sc_in<unsigned>> addr;
-    vector<sc_in<uint128_t>> data_in;
-    vector<sc_out<uint128_t>> data_out;
-    
-    vector<L1Bank*> banks;
-    
-    SC_CTOR(L1Memory);
+    // 二维 sc_signal 向量：128 个 bank，每个有 256 depth
+    sc_vector<sc_vector<sc_signal<data128_t>>> banks;
+
+    SC_CTOR(L1Memory) : banks("banks") {
+        banks.init(BANK_NUM);
+        for (int i = 0; i < BANK_NUM; ++i)
+            banks[i].init(BANK_DEPTH);
+    }
+    void write(int bank_id, int addr, data128_t data);
+    data128_t read(int bank_id, int addr);
 };
 
-#endif // L1MEMORY_H
+#endif

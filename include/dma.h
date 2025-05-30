@@ -1,34 +1,42 @@
+// dma.h
 #ifndef DMA_H
 #define DMA_H
 
 #include "common.h"
+#include "l1memory.h"
+#include "l2memory.h"
 
 SC_MODULE(DMA) {
     sc_in<bool> clk;
-    sc_in<bool> start;
-    sc_in<bool> direction;  // 0: L2->L1, 1: L1->L2
-    sc_in<unsigned> l2_addr;
-    sc_in<unsigned> l1_bank;
-    sc_in<unsigned> l1_addr;
-    sc_in<unsigned> length;
-    sc_out<bool> done;
-    
-    sc_port<sc_signal_out_if<uint128_t>> l2_data_out;
-    sc_port<sc_signal_in_if<uint128_t>> l2_data_in;
-    sc_port<sc_signal_out_if<bool>> l2_write_en;
-    sc_port<sc_signal_out_if<unsigned>> l2_addr_out;
-    
-    sc_port<sc_signal_out_if<bool>> l1_write_en;
-    sc_port<sc_signal_out_if<unsigned>> l1_bank_out;
-    sc_port<sc_signal_out_if<unsigned>> l1_addr_out;
-    sc_port<sc_signal_out_if<uint128_t>> l1_data_out;
-    sc_port<sc_signal_in_if<uint128_t>> l1_data_in;
-    
+    L1Memory* l1;
+    L2Memory* l2;
+
     SC_CTOR(DMA) {
-        SC_CTHREAD(transfer, clk.pos());
+        SC_THREAD(run);
+        sensitive << clk.pos();
     }
-    
-    void transfer();
+
+    // load指令
+    struct LoadJob {
+        int l2_addr;
+        int l1_bank;
+        int length; // unit: 128bit
+        bool valid = false;
+    } load_job;
+
+    // save指令
+    struct SaveJob {
+        int l1_bank;
+        int l2_addr;
+        int length;
+        bool valid = false;
+    } save_job;
+
+    void set_load(int l2_addr, int bank, int len);
+    void set_save(int bank, int l2_addr, int len);
+
+private:
+    void run();
 };
 
-#endif // DMA_H
+#endif
